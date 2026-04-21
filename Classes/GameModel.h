@@ -40,6 +40,16 @@ public:
     CardModel* getTopHandCard() const;
     void updateFaceUpStatus();
 
+    /**
+     * @brief Check if game is won (Tableau is empty)
+     */
+    bool checkWin() const;
+
+    /**
+     * @brief Check if game is over (No legal moves and Stock is empty)
+     */
+    bool checkGameOver();
+
 private:
     std::vector<std::vector<CardModel*>> _mainAreaCards;
     std::vector<CardModel*> _handAreaCards;

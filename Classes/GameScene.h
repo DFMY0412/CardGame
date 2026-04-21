@@ -27,13 +27,23 @@ public:
     void onStockClicked();
     void onUndoClicked();
 
+    cocos2d::Vec2 getCardPosition(CardModel* model);
+
+    void resetGame();
     void refreshAllCards();
+    void showGameResult(bool isWin);
 
 private:
+    float getCardScale(); // Helper to calculate dynamic scale
     GameModel _gameModel;
     std::vector<CardSprite*> _cardSprites;
     std::map<CardModel*, CardSprite*> _modelToSprite;
     cocos2d::Sprite* _stockPileSprite;
+    cocos2d::Label* _stockCountLabel;
+    cocos2d::Label* _progressLabel;
+
+    // Selection support
+    CardSprite* _selectedSprite;
 
     // Drag and Drop support
     CardSprite* _draggedSprite;

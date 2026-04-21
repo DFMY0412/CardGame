@@ -26,6 +26,7 @@ void CardSprite::updateView() {
     if (!_model) return;
 
     this->removeAllChildren();
+    _selectionNode = nullptr; // Clear dangling pointer after removeAllChildren
 
     if (_model->isFaceUp) {
         this->setColor(Color3B::WHITE);
@@ -70,12 +71,39 @@ void CardSprite::updateView() {
             auto smallSuit = Sprite::create(suitPath);
             if (smallSuit) {
                 smallSuit->setAnchorPoint(Vec2(1, 1));
-                smallSuit->setScale(0.5f); // Increased scale from 0.35f to 0.5f
+                smallSuit->setScale(0.5f);
                 smallSuit->setPosition(Vec2(contentSize.width - 10, contentSize.height - 10));
                 this->addChild(smallSuit);
             }
         }
     } else {
         this->setColor(Color3B(100, 100, 100));
+    }
+
+    // Re-draw selection highlight if needed
+    if (_isSelected) {
+        setSelected(true);
+    }
+}
+
+void CardSprite::setSelected(bool selected) {
+    _isSelected = selected;
+    if (_selectionNode) {
+        _selectionNode->removeFromParent();
+        _selectionNode = nullptr;
+    }
+
+    if (_isSelected) {
+        _selectionNode = DrawNode::create();
+        float margin = 2.0f;
+        Size size = this->getContentSize();
+        Vec2 vertices[] = {
+            Vec2(-margin, -margin),
+            Vec2(size.width + margin, -margin),
+            Vec2(size.width + margin, size.height + margin),
+            Vec2(-margin, size.height + margin)
+        };
+        _selectionNode->drawPolygon(vertices, 4, Color4F(1, 0.84f, 0, 0.5f), 3.0f, Color4F(1, 0.84f, 0, 1)); // Gold
+        this->addChild(_selectionNode, -1);
     }
 }

@@ -36,11 +36,11 @@ void GameModel::setupGame() {
     std::mt19937 g(rd());
     std::shuffle(deck.begin(), deck.end(), g);
 
-    // 4. 分配到主牌区 (5列，减少列数以获得更多空间)
-    _mainAreaCards.resize(5);
+    // 4. Setup Main Pile (7 columns * 4 cards = 28 cards)
+    _mainAreaCards.resize(7);
     int deckIndex = 0;
-    for (int i = 0; i < 5; ++i) {
-        // 每列发 4 张牌
+    for (int i = 0; i < 7; ++i) {
+        // Each column gets 4 cards
         for (int j = 0; j < 4; ++j) {
             CardModel* card = deck[deckIndex++];
             if (j == 3) card->isFaceUp = true;
@@ -52,7 +52,7 @@ void GameModel::setupGame() {
     firstHandCard->isFaceUp = true;
     _handAreaCards.push_back(firstHandCard);
 
-    while (deckIndex < deck.size()) {
+    while (static_cast<size_t>(deckIndex) < deck.size()) {
         _stockCards.push_back(deck[deckIndex++]);
     }
 }
@@ -132,4 +132,34 @@ void GameModel::updateFaceUpStatus() {
             column.back()->isFaceUp = true;
         }
     }
+}
+
+bool GameModel::checkWin() const {
+    for (const auto& column : _mainAreaCards) {
+        if (!column.empty()) return false;
+    }
+    return true;
+}
+
+bool GameModel::checkGameOver() {
+    // 1. If stock is not empty, game is not over
+    if (!_stockCards.empty()) return false;
+
+    // 2. If already won, it's not "Game Over" (failure)
+    if (checkWin()) return false;
+
+    CardModel* topHand = getTopHandCard();
+    if (!topHand) return false;
+
+    // 3. Check if any card in main area (tableau) can match the top hand card
+    for (const auto& column : _mainAreaCards) {
+        if (!column.empty()) {
+            if (canMatch(column.back()->rank, topHand->rank)) {
+                return false;
+            }
+        }
+    }
+
+    // 4. If we reached here, no moves are possible and stock is empty
+    return true;
 }

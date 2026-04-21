@@ -13,12 +13,19 @@ public:
     static CardSprite* create(CardModel* model);
     void updateView();
 
+    void setSelected(bool selected);
+    bool isSelected() const { return _isSelected; }
+
     CC_SYNTHESIZE(CardModel*, _model, Model);
 
 protected:
-    CardSprite() : _model(nullptr) {}
+    CardSprite() : _model(nullptr), _isSelected(false), _selectionNode(nullptr) {}
     virtual ~CardSprite() {}
     bool init(CardModel* model);
+
+private:
+    bool _isSelected;
+    cocos2d::DrawNode* _selectionNode;
 };
 
 #endif // __CARD_SPRITE_H__
